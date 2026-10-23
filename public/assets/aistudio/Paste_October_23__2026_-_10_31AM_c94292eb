@@ -1,0 +1,757 @@
+# MASTER DEVELOPMENT PROMPT
+## Design and Implementation of an Online Student Complaint System
+### A Case Study of the Department of Mechanical Engineering, Bayero University Kano (BUK)
+
+## 1. ROLE AND DEVELOPMENT OBJECTIVE
+
+Act as a senior full-stack software engineer, system analyst, database architect, UI/UX designer, cybersecurity specialist, and software tester.
+
+Design, develop, test, document, and prepare for deployment a complete, secure, responsive web-based application titled:
+
+**Online Student Complaint Management System (OSCMS)**
+
+**Case Study:** Department of Mechanical Engineering, Bayero University Kano (BUK), Kano State, Nigeria.
+
+The primary objective is to provide a centralised online platform through which students can submit academic and administrative complaints, track complaint status, receive official responses, communicate with authorised departmental officers, and obtain resolution updates without having to depend entirely on physical visits or informal communication channels.
+
+The system must support authorised departmental staff in receiving, categorising, assigning, investigating, escalating, resolving, and reporting complaints.
+
+Do not build only a landing page, static interface, or frontend demonstration. Develop a functional full-stack application with a persistent database, secure authentication, server-side authorisation, complaint workflows, audit trails, and automated tests.
+
+## 2. DEVELOPMENT RULES
+
+Before writing or modifying code:
+
+1. Inspect the existing project files and identify the current framework, application structure, database, installed dependencies, and deployment configuration.
+2. If the repository already contains an application, preserve working functionality and extend the existing implementation rather than unnecessarily rebuilding it.
+3. Identify incomplete features, broken routes, missing database models, security weaknesses, and deployment blockers.
+4. Produce a concise implementation plan and then execute it incrementally.
+5. Establish a clear database schema and role-permission matrix before implementing complaint workflows.
+6. Build and test each module before integrating it with the next module.
+7. Do not fabricate successful test results, database records, authentication behaviour, or deployment status.
+8. Use synthetic demonstration data during development.
+9. Do not claim that the system is officially approved, endorsed, or integrated with BUK unless such authorisation has been provided.
+10. If an essential institutional detail is unavailable, use a clearly documented configurable placeholder rather than inventing an official policy.
+
+## 3. TECHNOLOGY STACK
+
+Use the following stack unless the existing project has a sound, compatible architecture that should be preserved.
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+- React Hook Form
+- Zod for validation
+- A suitable accessible icon library
+- A charting library for administrative reports where required
+
+### Backend
+- Node.js
+- Express.js
+- TypeScript
+- RESTful API architecture
+- Server-side input validation
+- Centralised error handling
+- Structured logging
+
+### Database
+- PostgreSQL
+- Prisma ORM
+- Database migrations
+- Foreign-key constraints
+- Unique constraints and appropriate indexes
+- Database transactions for operations requiring multiple consistent updates
+
+### Supporting services
+- Git and GitHub for version control
+- SMTP-compatible email service for notifications, where configured
+- Secure file storage for complaint attachments, where enabled
+- A compatible cloud hosting provider for the frontend, backend, and database
+
+Do not hard-code API keys, database credentials, JWT secrets, SMTP credentials, or storage credentials. Store sensitive values in environment variables or a managed secrets facility.
+
+## 4. USER ROLES AND ACCESS CONTROL
+
+Implement role-based access control (RBAC). Every protected operation must be authorised on the backend.
+
+### Role 1: Student
+
+Students must be able to:
+
+- Register using approved registration information or an institution-approved account provisioning process.
+- Log in and securely manage their accounts.
+- View and update permitted profile information.
+- Submit new complaints.
+- Select a complaint category and provide a clear description.
+- Upload supporting documents or images within configured limits.
+- Receive a unique complaint reference number.
+- View their own complaint history and status.
+- Read official responses to their complaints.
+- Send follow-up messages where the workflow permits.
+- Receive status notifications.
+- Reopen or request a review of a complaint only where an approved policy permits it.
+- View the final resolution and closure date.
+- Log out securely.
+
+Students must not be able to view, edit, or delete another student's complaint or private information.
+
+### Role 2: Department Complaint Officer
+
+This role handles routine complaint processing.
+
+Required capabilities:
+
+- View complaints assigned to the officer or authorised departmental queue.
+- Review submitted complaint details and attachments.
+- Categorise complaints.
+- Set or recommend priority according to approved rules.
+- Assign complaints to authorised handlers.
+- Request clarification or additional evidence from students.
+- Add internal investigation notes.
+- Send official responses.
+- Update permitted workflow statuses.
+- Escalate complaints to the Head of Department or another authorised officer.
+- Record resolution details.
+- View workload and complaint-processing summaries.
+
+Internal notes must be clearly separated from student-visible messages.
+
+### Role 3: Head of Department (HOD)
+
+Provide a management dashboard with capabilities to:
+
+- View departmental complaints according to assigned permissions.
+- Review escalated or sensitive complaints.
+- Assign or reassign complaint handlers.
+- Monitor overdue and unresolved cases.
+- Review investigation and resolution recommendations.
+- Approve or reject proposed resolutions where required.
+- Return cases for further investigation.
+- Authorise closure according to departmental policy.
+- Review complaint statistics and performance reports.
+- Review the audit history of relevant complaints.
+
+The HOD must not be able to silently alter or erase the audit history.
+
+### Role 4: System Administrator
+
+Provide administrative capabilities to:
+
+- Manage user accounts and account status.
+- Assign and revoke approved roles.
+- Configure complaint categories and workflow settings.
+- Configure notification settings.
+- Manage system-wide settings.
+- Review security events and administrative audit records.
+- Manage approved retention and backup settings.
+- View system health information.
+
+Administrative privileges must not automatically grant unrestricted access to confidential complaint content unless that access is explicitly authorised by institutional policy.
+
+### Role 5: Optional Read-Only Reviewer
+
+Implement this role only if it is required and approved.
+
+The reviewer may view specifically authorised complaint records and reports but must not modify complaint content, assign cases, or issue official responses.
+
+## 5. STUDENT REGISTRATION AND AUTHENTICATION
+
+Implement secure authentication with:
+
+- Validated registration forms.
+- Unique email addresses or approved student identifiers.
+- Secure password hashing using Argon2id or bcrypt with appropriate parameters.
+- Password reset using time-limited, single-use tokens.
+- Session expiry and secure logout.
+- Login rate limiting.
+- Protection against brute-force attempts.
+- Server-side input validation.
+- Authentication and account-management audit events.
+- Appropriate session-cookie settings if cookie-based authentication is selected.
+- CSRF protection where required by the chosen authentication architecture.
+- Secure handling of authentication errors.
+
+The system must support a configurable registration policy. If institutional verification is required, implement an approval or verification workflow rather than automatically treating every self-registered account as a verified BUK student.
+
+Do not use real BUK student records in demonstration data.
+
+## 6. COMPLAINT MANAGEMENT MODULE
+
+This is the core module of the application.
+
+### 6.1 Complaint submission
+
+Create a structured complaint submission form containing:
+
+- Automatically generated complaint reference number.
+- Student identifier and account details, populated from the authenticated account where appropriate.
+- Complaint title.
+- Complaint category.
+- Complaint description.
+- Date submitted.
+- Optional supporting documents.
+- Relevant course code, level, semester, or academic session where applicable.
+- Optional requested outcome.
+- Consent or declaration confirming that the information is accurate, where approved.
+
+Do not require a student to enter their name or student identifier repeatedly if the information is already securely available from their authenticated profile.
+
+### 6.2 Complaint categories
+
+Make categories configurable by authorised administrators.
+
+Seed the system with illustrative categories such as:
+
+1. Examination and results.
+2. Course registration.
+3. Lectures and timetable.
+4. Continuous assessment.
+5. Project and supervision.
+6. Laboratory and workshop facilities.
+7. Departmental administration.
+8. Academic advising.
+9. Student records and documentation.
+10. Other departmental matters.
+
+These are proposed categories, not a claim that BUK has formally adopted them.
+
+### 6.3 Complaint reference numbers
+
+Generate unique, non-guessable complaint identifiers.
+
+A readable format may be used, for example:
+
+`MECH-2026-000001`
+
+The year and sequence should be generated safely to prevent duplicate references under concurrent submissions. Do not use sequential complaint numbers as the sole security mechanism.
+
+### 6.4 Complaint status workflow
+
+Implement the following configurable workflow:
+
+- Draft
+- Submitted
+- Under Initial Review
+- Awaiting Student Information
+- Assigned for Investigation
+- Under Investigation
+- Escalated
+- Resolution Proposed
+- Resolved
+- Closed
+- Reopened, where authorised
+- Rejected, where permitted by policy
+
+Define permitted transitions between statuses. A user must not be allowed to jump arbitrarily from one status to another.
+
+For every status change, record:
+
+- Previous status.
+- New status.
+- User responsible.
+- Timestamp.
+- Reason or comment where required.
+- Whether the update is visible to the student.
+
+A complaint must not be marked resolved or closed without the required resolution details and permissions.
+
+### 6.5 Complaint assignment and escalation
+
+Allow authorised officers to assign complaints to approved handlers.
+
+Implement:
+
+- Assignment history.
+- Reassignment with a recorded reason.
+- Escalation to the HOD or another authorised role.
+- Priority levels such as Low, Normal, High, and Urgent.
+- Configurable service targets and due dates.
+- Overdue complaint indicators.
+- Escalation history.
+- Workload summaries for authorised managers.
+
+Do not invent official departmental response deadlines. Make deadlines configurable and identify them as proposed defaults until the department approves them.
+
+### 6.6 Complaint communication
+
+Provide a secure message thread for each complaint.
+
+Support:
+
+- Student-visible messages.
+- Official staff responses.
+- Internal staff notes that students cannot see.
+- Attachment references where permitted.
+- Timestamps and sender identification.
+- Read or response indicators where appropriate.
+
+The backend must enforce message visibility. Do not rely on frontend filtering to hide internal notes.
+
+## 7. DASHBOARDS
+
+### 7.1 Student dashboard
+
+Display:
+
+- Total complaints submitted.
+- Complaints awaiting review.
+- Complaints under investigation.
+- Complaints awaiting student information.
+- Resolved complaints.
+- Recently updated complaints.
+- Complaint reference numbers.
+- Current status and last-update date.
+- A prominent “Submit New Complaint” action.
+
+Students should see only their own records.
+
+### 7.2 Complaint Officer dashboard
+
+Display:
+
+- Complaints awaiting assignment.
+- Complaints assigned to the logged-in officer.
+- Complaints awaiting student information.
+- Complaints under investigation.
+- Overdue complaints.
+- Recently escalated complaints.
+- Workload by status.
+- Search and filter controls.
+
+### 7.3 HOD dashboard
+
+Display:
+
+- Total complaints received.
+- New complaints.
+- Complaints under investigation.
+- Resolved and closed complaints.
+- Overdue complaints.
+- Escalated complaints.
+- Average resolution time.
+- Resolution rate.
+- Complaint categories and trends.
+- Workload by handler.
+- Monthly and semester-based summaries.
+
+All dashboard figures must be calculated from actual authorised database records. Do not hard-code numbers into production charts.
+
+### 7.4 Administrator dashboard
+
+Display:
+
+- Total active and inactive accounts.
+- User counts by role.
+- Complaint-processing statistics where authorised.
+- Authentication and system-event summaries.
+- Failed background tasks or notification failures where available.
+- System configuration and health indicators.
+
+## 8. SEARCH, FILTERING, AND REPORTS
+
+Implement secure search and filtering by:
+
+- Complaint reference number.
+- Complaint category.
+- Status.
+- Submission date range.
+- Academic session.
+- Assigned handler.
+- Priority.
+- Resolution date.
+
+Restrict every search to the authenticated user's permissions.
+
+Provide reports for authorised users, including:
+
+- Complaints received by month.
+- Complaints by category.
+- Complaints by status.
+- Complaints resolved within configured service targets.
+- Overdue complaints.
+- Complaint workload by handler.
+- Average resolution time.
+- Complaint trends across academic sessions.
+
+Support CSV export and printable PDF reports where appropriate.
+
+Exports must follow the same access-control rules as the application. Exclude passwords, session tokens, internal notes not authorised for the recipient, and unnecessary personal data.
+
+## 9. DATABASE DESIGN
+
+Design a normalised PostgreSQL database with appropriate primary keys, foreign keys, constraints, and indexes.
+
+Include, at minimum, the following entities:
+
+- `users`
+- `roles`
+- `permissions`
+- `role_permissions`
+- `student_profiles`
+- `complaints`
+- `complaint_categories`
+- `complaint_assignments`
+- `complaint_status_history`
+- `complaint_messages`
+- `complaint_attachments`
+- `complaint_internal_notes`
+- `notifications`
+- `audit_logs`
+- `system_settings`
+
+Additional entities may be introduced where justified.
+
+### Database requirements
+
+1. Each complaint must belong to an authenticated student account.
+2. Each complaint must have a unique reference number.
+3. Assignments must reference valid users and complaints.
+4. Status history must preserve prior status changes.
+5. Messages must reference the complaint and authenticated sender.
+6. Internal notes must be stored separately or explicitly protected through server-side visibility rules.
+7. Attachments must have metadata, ownership, access restrictions, file type, file size, and storage reference.
+8. Foreign-key constraints must protect relationships.
+9. Database migrations must be version-controlled.
+10. Multi-step operations must use database transactions where necessary.
+11. Index frequently searched fields, including complaint reference, status, category, creation date, and assignment fields.
+12. Avoid storing unnecessary sensitive student information.
+13. Prevent duplicate submissions caused by retries where appropriate, using idempotency or duplicate-submission controls.
+14. Preserve audit history when complaints are reassigned, resolved, reopened, or closed.
+
+Generate the Prisma schema, migration files, and safe development seed script.
+
+## 10. API DESIGN
+
+Develop a versioned REST API with consistent response formats and error handling.
+
+Example endpoint groups:
+
+### Authentication
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/logout`
+- `POST /api/v1/auth/forgot-password`
+- `POST /api/v1/auth/reset-password`
+- `GET /api/v1/auth/me`
+
+### Student complaints
+- `POST /api/v1/complaints`
+- `GET /api/v1/complaints/my`
+- `GET /api/v1/complaints/:id`
+- `PATCH /api/v1/complaints/:id`
+- `POST /api/v1/complaints/:id/messages`
+- `POST /api/v1/complaints/:id/attachments`
+
+### Staff complaint operations
+- `GET /api/v1/staff/complaints`
+- `POST /api/v1/staff/complaints/:id/assign`
+- `POST /api/v1/staff/complaints/:id/status`
+- `POST /api/v1/staff/complaints/:id/escalate`
+- `POST /api/v1/staff/complaints/:id/resolve`
+- `POST /api/v1/staff/complaints/:id/close`
+
+### Administration and reporting
+- `/api/v1/admin/users`
+- `/api/v1/admin/roles`
+- `/api/v1/admin/categories`
+- `/api/v1/admin/settings`
+- `/api/v1/reports/complaints`
+- `/api/v1/reports/analytics`
+- `/api/v1/audit-logs`
+
+These are proposed endpoint examples. Implement only the operations required by the final design, and enforce authentication, authorisation, validation, and audit requirements on every protected endpoint.
+
+Never trust a user ID, role, complaint owner, or permission supplied by the frontend. Derive the authenticated identity from the verified session or token and validate all object access on the server.
+
+## 11. SECURITY REQUIREMENTS
+
+Apply secure-development practices throughout the project.
+
+Implement:
+
+- Server-side role-based access control.
+- Object-level authorisation to prevent insecure direct object references (IDOR/BOLA).
+- Secure password hashing.
+- Session expiry and secure logout.
+- Rate limiting on authentication and sensitive endpoints.
+- Server-side input validation.
+- Protection against SQL injection through safe ORM usage.
+- Output encoding and appropriate XSS protections.
+- CSRF protection where applicable.
+- Secure CORS configuration.
+- HTTP security headers.
+- Safe file upload handling.
+- Attachment access checks.
+- Audit logging.
+- Environment-variable management.
+- Dependency vulnerability checks.
+- Generic authentication error messages that do not expose sensitive account information.
+- Database backup and restoration procedures.
+- Production error handling that does not expose stack traces or secrets.
+- Appropriate data-retention and deletion controls.
+
+Treat uploaded documents as untrusted input. Validate file size and type, generate safe storage names, prevent executable uploads, and keep files outside publicly accessible directories. Serve files through authorised access checks or securely configured private storage.
+
+Do not log passwords, authentication tokens, password-reset tokens, or full complaint contents unnecessarily.
+
+Design with applicable Nigerian data-protection requirements in mind, including the Nigeria Data Protection Act 2023 where applicable. Avoid claiming legal compliance solely because security controls have been implemented; institutional review and appropriate compliance assessment may still be necessary.
+
+## 12. UI/UX AND VISUAL DESIGN
+
+Create a professional university departmental interface.
+
+### Design principles
+- Clean, modern academic appearance.
+- Responsive layout for desktop, tablet, and mobile.
+- Accessible colour contrast.
+- Clear typography and readable forms.
+- Consistent spacing and reusable components.
+- Simple navigation.
+- Clear loading, empty, success, and error states.
+- Confirmation prompts for important actions.
+- Helpful validation messages.
+- Accessible labels and keyboard navigation.
+
+Use a restrained academic colour palette such as navy blue, white, and neutral grey. Do not use official BUK logos, seals, or branded materials unless supplied or authorised. The interface may identify the case study as the Department of Mechanical Engineering, Bayero University Kano, without claiming official institutional deployment or endorsement.
+
+### Required screens
+
+1. Public welcome/login page.
+2. Student registration or account activation page.
+3. Login page.
+4. Password-reset pages.
+5. Student dashboard.
+6. New complaint form.
+7. Complaint detail and tracking page.
+8. Complaint message thread.
+9. Student complaint history.
+10. Complaint officer dashboard.
+11. Complaint queue and filters.
+12. Complaint investigation workspace.
+13. Assignment and escalation interface.
+14. Resolution and closure interface.
+15. HOD dashboard.
+16. Analytics and reporting pages.
+17. User and role management.
+18. Complaint category configuration.
+19. Audit-log viewer.
+20. System settings page.
+21. Access-denied and not-found pages.
+
+Use reusable form fields, tables, status indicators, modal dialogs, pagination, and dashboard cards.
+
+## 13. NOTIFICATIONS
+
+Implement in-application notifications and optionally email notifications when the required service is configured.
+
+Notification events may include:
+
+- Complaint successfully submitted.
+- Complaint assigned to an officer.
+- Complaint status changed.
+- Additional information requested.
+- Staff response received.
+- Complaint escalated.
+- Resolution proposed.
+- Complaint resolved or closed.
+- Complaint reopened.
+- Complaint approaching or exceeding its approved deadline.
+
+Notifications must not disclose sensitive complaint content in email subject lines or other channels where confidentiality cannot be guaranteed.
+
+Notification failure must not cause a successfully recorded complaint to be lost.
+
+## 14. TESTING AND QUALITY ASSURANCE
+
+Develop automated tests and a documented manual test plan.
+
+### Unit tests
+Test:
+- Complaint reference generation.
+- Complaint status-transition rules.
+- Permission checks.
+- Input validation.
+- Priority and due-date calculations.
+- Reporting calculations.
+
+### Integration tests
+Test:
+- Registration and authentication.
+- Complaint creation and persistence.
+- Assignment and reassignment.
+- Messaging and internal-note separation.
+- Status updates and audit history.
+- Attachment upload and authorised retrieval.
+- Notifications.
+- Database transactions.
+- Reporting queries.
+
+### Security tests
+Verify that:
+
+- An unauthenticated visitor cannot access protected complaint data.
+- Student A cannot retrieve Student B's complaint by changing an ID or URL.
+- Students cannot access staff-only endpoints.
+- Complaint officers cannot perform unauthorised administrative actions.
+- Unauthorised users cannot view internal notes.
+- Users cannot change their role by modifying a request.
+- A user cannot close or resolve a complaint without the required permission.
+- Malicious or oversized attachments are rejected.
+- Rate limits are applied to sensitive endpoints.
+- Audit records are created for important actions.
+- Secrets do not appear in frontend bundles or repository history.
+
+### End-to-end tests
+Verify complete workflows:
+
+1. A student logs in and submits a complaint.
+2. The system assigns a unique complaint reference.
+3. An authorised officer reviews and assigns the complaint.
+4. The officer requests additional information.
+5. The student responds.
+6. The officer investigates and proposes a resolution.
+7. The HOD approves the resolution if required.
+8. The complaint is closed according to policy.
+9. The student views the final outcome.
+10. The audit trail contains the expected events.
+
+### Build and release checks
+
+Before declaring the application ready:
+
+- Run TypeScript checks.
+- Run linting.
+- Run unit and integration tests.
+- Run the production build.
+- Verify database migrations.
+- Test the primary user journeys.
+- Review authorisation and file-access behaviour.
+- Confirm that environment variables are correctly configured.
+- Document unresolved defects and known limitations.
+
+Never report tests as passed unless they have actually been executed and their results inspected.
+
+## 15. DEPLOYMENT AND ENVIRONMENT CONFIGURATION
+
+Prepare the application for deployment to a compatible hosting platform.
+
+Provide:
+
+- Frontend deployment instructions.
+- Backend deployment instructions.
+- PostgreSQL provisioning and migration instructions.
+- Environment-variable templates.
+- Production build commands.
+- Database migration commands.
+- A safe development seed command.
+- HTTPS and CORS configuration guidance.
+- Backup and restoration instructions.
+- Health-check endpoint.
+- Logging and monitoring guidance.
+- Custom-domain setup instructions where required.
+- Deployment rollback guidance.
+
+Create a `.env.example` file containing placeholder values only. Never commit live credentials.
+
+Use separate development, testing, and production databases. Production must not be seeded with demonstration accounts or sample complaints.
+
+Do not claim deployment is complete until the live application, API, database connectivity, authentication, and core complaint workflow have been verified.
+
+## 16. PROJECT DOCUMENTATION
+
+Generate and maintain the following documentation:
+
+1. Project overview and objectives.
+2. System requirements specification.
+3. Functional and non-functional requirements.
+4. Use-case diagram.
+5. System architecture diagram.
+6. Complaint workflow diagram.
+7. Data-flow diagram.
+8. Database entity-relationship diagram.
+9. Database schema documentation.
+10. API endpoint documentation.
+11. User-role and permission matrix.
+12. Installation and deployment guide.
+13. User guide for students.
+14. User guide for complaint officers and the HOD.
+15. Administrator guide.
+16. Test plan and actual test results.
+17. Security considerations.
+18. Limitations and future enhancements.
+
+The documentation must distinguish proposed features, implemented features, tested features, and deployed features.
+
+## 17. IMPLEMENTATION ROADMAP
+
+Work in the following order.
+
+### Phase 1 — Project inspection and planning
+Inspect the existing codebase, confirm the architecture, document requirements, establish the role-permission matrix, and design the database.
+
+### Phase 2 — Core foundation
+Implement database connectivity, migrations, authentication, session handling, user management, role-based access control, validation, and error handling.
+
+### Phase 3 — Complaint lifecycle
+Implement complaint submission, reference generation, categorisation, assignment, status transitions, communication, investigation, escalation, resolution, and closure.
+
+### Phase 4 — Dashboards and reporting
+Build student, officer, HOD, and administrator dashboards, search, filters, analytics, and authorised report exports.
+
+### Phase 5 — Notifications and attachments
+Implement secure attachment handling and configurable in-app/email notifications.
+
+### Phase 6 — Security and testing
+Run automated tests, access-control tests, object-level authorisation tests, workflow tests, and build checks. Correct defects before release.
+
+### Phase 7 — Deployment
+Configure the production environment, migrate the database, deploy the application, verify the live workflow, and document rollback and backup procedures.
+
+### Phase 8 — Final handover
+Provide the source code, database migrations, configuration template, documentation, test results, deployment instructions, and a list of known limitations.
+
+## 18. ACCEPTANCE CRITERIA
+
+The project is considered functionally complete only when the following conditions have been demonstrated:
+
+- Students can authenticate and submit complaints.
+- Each complaint receives a unique reference number.
+- Students can track only their own complaints.
+- Authorised staff can review, assign, investigate, escalate, and resolve complaints.
+- Internal staff notes are not visible to students.
+- Complaint status changes follow permitted transitions.
+- Role and object-level permissions are enforced server-side.
+- Complaint messages and attachments follow the correct access rules.
+- Audit records are maintained for significant actions.
+- Dashboards and reports use actual database information.
+- The application validates inputs and handles errors safely.
+- Automated tests are executed and their actual results documented.
+- Database migrations and backup procedures are documented.
+- The application can be deployed using documented configuration.
+- No production credentials are exposed in source code or frontend bundles.
+- The final report accurately describes what was implemented, tested, and deployed.
+
+## 19. FINAL INSTRUCTION TO THE AI DEVELOPER
+
+Begin by inspecting the current project and identifying the existing application architecture. Then implement the system incrementally, preserving existing working code where appropriate.
+
+Do not stop after producing a plan, UI mock-up, or sample dashboard. Continue through database design, backend implementation, frontend integration, role-based access control, complaint workflows, testing, documentation, and deployment preparation.
+
+If you encounter a blocker, explain the exact cause, identify the affected files or components, and implement the best safe solution available.
+
+At each milestone, report:
+
+1. Features implemented.
+2. Files created or modified.
+3. Database changes made.
+4. Tests actually executed and their results.
+5. Security checks completed.
+6. Remaining defects or limitations.
+7. The next concrete implementation step.
+
+Prioritise a secure, functional minimum viable product over a large collection of unfinished modules. Do not invent BUK policies, official approval, institutional integrations, or successful deployment results.
+
+**Start now by inspecting the existing project, presenting a concise architecture and implementation plan, and then proceeding with the first implementation milestone.**

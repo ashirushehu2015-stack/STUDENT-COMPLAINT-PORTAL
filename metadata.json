@@ -1,0 +1,6 @@
+{
+  "name": "Online Student Complaint Management System (OSCMS) - BUK Mechanical Engineering",
+  "description": "A centralized, secure online complaint management and resolution tracking platform for the Department of Mechanical Engineering, Bayero University Kano (BUK).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
